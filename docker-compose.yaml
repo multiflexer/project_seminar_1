@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  model:
+    image: model_app
+    environment:
+      - RABBITMQ_SRC_HOST=${RABBITMQ_SRC_HOST}
+      - RABBITMQ_SRC_QUEUE=${RABBITMQ_SRC_QUEUE}
+      - REDIS_HOST=${REDIS_HOST}
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    depends_on:
+      - rabbit
+      - redis
+    working_dir: /app
+    command: python main.py
+
+  rabbit:
+    image: rabbitmq:3-management
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+    ports:
+      - "15672:15672"
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"

@@ -1,0 +1,22 @@
+@startuml
+skinparam componentStyle uml2
+actor Клиент as Client
+component ReviewAPI #99c7f7
+package "PostgreSQL" #DDDDDD{
+database Reviews
+}
+
+queue RabbitMQ #f7adad
+database RedisCluster #c92222
+
+package "Celery workers (scalable)" #c5f0dc{
+component ModelReplica1
+component ModelReplica2
+}
+
+Client -> ReviewAPI: Добавление отзыва
+ReviewAPI -> Reviews: Сохранение отзыва в БД
+ReviewAPI -down-> RabbitMQ: Отправка отзыва в модель
+RabbitMQ -down-> ModelReplica1: Потребление сообщения репликой модели
+ModelReplica1 -right-> RedisCluster: Сохранение результата в Redis
+@enduml

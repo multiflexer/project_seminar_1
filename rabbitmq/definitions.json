@@ -1,0 +1,87 @@
+{
+"queues": [
+    {
+        "name": "realtime_reviews",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {
+            "x-queue-type": "classic",
+            "x-dead-letter-exchange": "bad_messages",
+            "x-dead-letter-routing-key": "bad_message"
+        }
+    },
+      {
+        "name": "bad_messages_queue",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {
+            "x-queue-type": "classic"
+        }
+    }
+],
+"exchanges": [
+    {
+        "name": "reviews",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+    },
+      {
+        "name": "bad_messages",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+    }
+],
+"bindings": [
+  {
+        "source": "bad_messages",
+        "vhost": "/",
+        "destination": "bad_messages_queue",
+        "destination_type": "queue",
+        "routing_key": "bad_message",
+        "arguments": {}
+    },
+    {
+        "source": "reviews",
+        "vhost": "/",
+        "destination": "realtime_reviews",
+        "destination_type": "queue",
+        "routing_key": "realtime_reviews",
+        "arguments": {}
+    }
+  ],
+"users": [
+    {
+      "name": "guest",
+      "password_hash": "BMfxN8drrYcIqXZMr+pWTpDT0nMcOagMduLX0bjr4jwud/pN",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [
+        "administrator"
+      ],
+      "limits": {}
+    }
+  ],
+"vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+"permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ]
+}
